@@ -32,6 +32,7 @@ Shadcn 컴포넌트를 추가할 때는 반드시
 `npx shadcn@latest add <component>`를 사용합니다.
 `npx shadcn-ui@latest`는 잘못된 명령어입니다.
 - 의존성 충돌 발생 시 `--peer-legacy-deps` 옵션을 사용합니다.
+- toast는 'sonner'를 설치합니다.
 
 ### Next.js 사용 주의 사항
 - Next.js의 15.1.6버전 App Router를 기준으로 제시합니다.
