@@ -1,6 +1,7 @@
 ---
 description: 프로젝트 진행을 위한 규칙입니다.
 globs: 
+alwaysApply: false
 ---
 # Cursor Rules for 개인용 다이어리 웹 애플리케이션
 
@@ -35,6 +36,7 @@ Shadcn 컴포넌트를 추가할 때는 반드시
 ### Next.js 사용 주의 사항
 - Next.js의 15.1.6버전 App Router를 기준으로 제시합니다.
 - params는 Next15버전에서 Promise로 바뀌었으므로, await를 사용하여 받습니다.
+- 모든 도메인 구현 코드는 src/ 에 포함됩니다.
 
 ### Supabase 사용 주의 사항
 - SQL문은 CLI가 아닌, 웹 대시보드에서 사용합니다.
