@@ -28,4 +28,33 @@ export async function createDiary(data: Pick<Diary, 'title' | 'content' | 'emoti
   }
 
   return diary;
+}
+
+// 모든 다이어리 목록을 가져오는 함수
+export async function getDiaries() {
+  const { data, error } = await supabase
+    .from('diary')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    throw error;
+  }
+
+  return data as Diary[];
+}
+
+// 특정 다이어리를 ID로 가져오는 함수
+export async function getDiaryById(id: string) {
+  const { data, error } = await supabase
+    .from('diary')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data as Diary;
 } 
