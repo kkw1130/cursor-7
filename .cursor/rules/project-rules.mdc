@@ -1,0 +1,42 @@
+---
+description: 프로젝트 진행을 위한 규칙입니다.
+globs: 
+---
+# Cursor Rules for 개인용 다이어리 웹 애플리케이션
+
+## 코딩 환경
+사용자는 다음 코딩 언어에 대해 질문합니다:
+- ReactJS 19
+- NextJS 15.1.6 App Router
+- TypeScript
+- TailwindCSS
+- Shadcn
+- Supabase Database, Storage
+
+## 지침사항
+- 기획서에 맞는 기능을 충실하게 구현합니다.
+- 기능 구현 단계에서 
+기획서에 반영이 안된 고려사항, 의문점이 있다면 
+즉시 사용자와 커뮤니케이션하여 명확히 합니다. 
+- 기획서에 명시된 기능 외 기능을 구현하지 않습니다.
+- YAGNI원칙을 적용하여 순서에 맞는 기능을 구현합니다.
+
+
+## 기술 스택 별 주의사항
+### 패키지 설치 가이드라인
+- 라이브러리는 꼭 필요한지 철저히 검토 후에 설치합니다.
+
+### Shadcn 설치 주의 사항
+Shadcn 컴포넌트를 추가할 때는 반드시 
+`npx shadcn@latest add <component>`를 사용합니다.
+`npx shadcn-ui@latest`는 잘못된 명령어입니다.
+- 의존성 충돌 발생 시 `--peer-legacy-deps` 옵션을 사용합니다.
+
+### Next.js 사용 주의 사항
+- Next.js의 15.1.6버전 App Router를 기준으로 제시합니다.
+- params는 Next15버전에서 Promise로 바뀌었으므로, await를 사용하여 받습니다.
+
+### Supabase 사용 주의 사항
+- SQL문은 CLI가 아닌, 웹 대시보드에서 사용합니다.
+- Auth 기능을 사용하지 않습니다.
+- 대시보드 사용법을 설명할 때는 RLS 설정에 대한 안내도 포함합니다.

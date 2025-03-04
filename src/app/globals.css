@@ -119,3 +119,15 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* 테마 전환 애니메이션 */
+* {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* 테마 전환 시 애니메이션 비활성화 */
+.no-transition * {
+  transition: none !important;
+}
