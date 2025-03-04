@@ -57,4 +57,40 @@ export async function getDiaryById(id: string) {
   }
 
   return data as Diary;
+}
+
+// 다이어리 수정 함수
+export async function updateDiary(
+  id: string, 
+  data: Pick<Diary, 'title' | 'content' | 'emotion' | 'weather' | 'diary_date'>
+) {
+  const { data: diary, error } = await supabase
+    .from('diary')
+    .update({
+      ...data,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return diary;
+}
+
+// 다이어리 삭제 함수
+export async function deleteDiary(id: string) {
+  const { error } = await supabase
+    .from('diary')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    throw error;
+  }
+
+  return true;
 } 

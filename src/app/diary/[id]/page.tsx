@@ -1,9 +1,10 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { getDiaryById } from '@/lib/diary';
+import { notFound, redirect } from 'next/navigation';
+import { getDiaryById, deleteDiary } from '@/lib/diary';
 import { Button } from '@/components/ui/button';
 import { formatDate } from '@/lib/utils';
 import { ArrowLeft, Edit, Trash } from 'lucide-react';
+import DeleteDiaryButton from '@/components/diary/DeleteDiaryButton';
 
 interface DiaryPageProps {
   params: Promise<{
@@ -45,10 +46,7 @@ export default async function DiaryPage({ params }: DiaryPageProps) {
                   수정
                 </Button>
               </Link>
-              <Button variant="destructive" size="sm" className="flex items-center gap-2">
-                <Trash className="h-4 w-4" />
-                삭제
-              </Button>
+              <DeleteDiaryButton id={diary.id} />
             </div>
           </div>
         </div>
