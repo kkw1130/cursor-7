@@ -31,17 +31,30 @@ export async function createDiary(data: Pick<Diary, 'title' | 'content' | 'emoti
 }
 
 // 모든 다이어리 목록을 가져오는 함수
-export async function getDiaries() {
-  const { data, error } = await supabase
-    .from('diary')
-    .select('*')
-    .order('created_at', { ascending: false });
+export async function getDiaries(searchTerm?: string) {
+  try {
+    // 기본 쿼리 설정
+    let query = supabase
+      .from('diary')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-  if (error) {
-    throw error;
+    // 검색어가 있는 경우 제목 필드에서만 검색
+    if (searchTerm) {
+      query = query.ilike('title', `%${searchTerm}%`);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      throw error;
+    }
+
+    return data as Diary[];
+  } catch (error) {
+    console.error('다이어리 검색 중 오류 발생:', error);
+    return []; // 오류 발생 시 빈 배열 반환
   }
-
-  return data as Diary[];
 }
 
 // 특정 다이어리를 ID로 가져오는 함수

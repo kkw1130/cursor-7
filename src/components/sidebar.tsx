@@ -1,9 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Search, Calendar, PenSquare } from "lucide-react";
+import { Menu, Search, PenSquare } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { CalendarPicker } from "@/components/calendar-picker";
+import { SearchBar } from "@/components/SearchBar";
 
 /**
  * 사이드바 컴포넌트
@@ -33,14 +36,8 @@ export function Sidebar({ className }: { className?: string }) {
         </Link>
       </nav>
 
-      {/* 검색 영역 - 추후 구현 */}
-      <div className="mb-6">
-        <h2 className="text-sm font-semibold mb-2">검색</h2>
-        <div className="flex items-center border rounded-md px-3 py-2">
-          <Search className="h-4 w-4 mr-2 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">검색...</span>
-        </div>
-      </div>
+      {/* 검색 영역 */}
+      <SearchBar />
 
       {/* 달력 영역 */}
       <div className="mb-6 overflow-visible">
