@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { getDiaryById, deleteDiary } from '@/lib/diary';
 import { Button } from '@/components/ui/button';
-import { formatDate } from '@/lib/utils';
+import { formatDate, getEmotionIcon, getWeatherIcon } from '@/lib/utils';
 import { ArrowLeft, Edit, Trash } from 'lucide-react';
 import DeleteDiaryButton from '@/components/diary/DeleteDiaryButton';
 
@@ -19,6 +19,10 @@ export default async function DiaryPage({ params }: DiaryPageProps) {
     
     // 다이어리 데이터 가져오기
     const diary = await getDiaryById(id);
+    
+    // 감정과 날씨 이모티콘 가져오기
+    const emotionIcon = getEmotionIcon(diary.emotion);
+    const weatherIcon = getWeatherIcon(diary.weather);
 
     return (
       <main className="container mx-auto py-6 px-4 md:px-6 max-w-4xl">
@@ -35,9 +39,21 @@ export default async function DiaryPage({ params }: DiaryPageProps) {
           <div className="flex justify-between items-start mb-4">
             <div>
               <h1 className="text-3xl font-bold mb-2">{diary.title}</h1>
-              <p className="text-muted-foreground">
-                {formatDate(diary.diary_date)} {diary.emotion} {diary.weather}
-              </p>
+              <div className="flex items-center text-muted-foreground">
+                <span>{formatDate(diary.diary_date)}</span>
+                <div className="flex items-center ml-3 space-x-2">
+                  {emotionIcon && (
+                    <div className="flex items-center gap-1" title={`감정: ${diary.emotion}`}>
+                      <span className="text-xl">{emotionIcon}</span>
+                    </div>
+                  )}
+                  {weatherIcon && (
+                    <div className="flex items-center gap-1" title={`날씨: ${diary.weather}`}>
+                      <span className="text-xl">{weatherIcon}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
             <div className="flex gap-2">
               <Link href={`/diary/${diary.id}/edit`}>

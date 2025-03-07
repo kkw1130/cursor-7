@@ -68,10 +68,7 @@ export default function DeleteDiaryButton({ id }: DeleteDiaryButtonProps) {
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isDeleting}>취소</AlertDialogCancel>
           <AlertDialogAction
-            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.preventDefault();
-              handleDelete();
-            }}
+            onClick={handleDelete}
             disabled={isDeleting}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >

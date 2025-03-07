@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatDate } from '@/lib/utils';
+import { formatDate, getEmotionIcon, getWeatherIcon } from '@/lib/utils';
 import { Diary } from '@/lib/diary';
 
 // 다이어리 내용에서 첫 번째 이미지 URL을 추출하는 함수
@@ -35,15 +35,29 @@ interface DiaryCardProps {
 export function DiaryCard({ diary }: DiaryCardProps) {
   const imageUrl = extractFirstImageUrl(diary.content);
   const textPreview = extractTextPreview(diary.content);
+  const emotionIcon = getEmotionIcon(diary.emotion);
+  const weatherIcon = getWeatherIcon(diary.weather);
 
   return (
     <Link href={`/diary/${diary.id}`} className="block h-full">
       <Card className="h-full flex flex-col hover:shadow-md transition-shadow duration-200">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg line-clamp-1">{diary.title}</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            {formatDate(diary.diary_date)} {diary.emotion} {diary.weather}
-          </p>
+          <div className="flex items-center text-sm text-muted-foreground">
+            <span>{formatDate(diary.diary_date)}</span>
+            <div className="flex items-center ml-2 space-x-2">
+              {emotionIcon && (
+                <span className="flex items-center" title={diary.emotion}>
+                  <span className="text-lg">{emotionIcon}</span>
+                </span>
+              )}
+              {weatherIcon && (
+                <span className="flex items-center" title={diary.weather}>
+                  <span className="text-lg">{weatherIcon}</span>
+                </span>
+              )}
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="flex-grow">
           {imageUrl && (

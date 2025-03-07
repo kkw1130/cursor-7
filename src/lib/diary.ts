@@ -47,29 +47,37 @@ export async function getDiaries(searchTerm?: string) {
     const { data, error } = await query;
 
     if (error) {
-      throw error;
+      throw new Error(`다이어리 목록 조회 실패: ${error.message}`);
     }
-
     return data as Diary[];
   } catch (error) {
     console.error('다이어리 검색 중 오류 발생:', error);
-    return []; // 오류 발생 시 빈 배열 반환
+    throw new Error(`다이어리 목록을 가져오는 중 오류가 발생했습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}`);
   }
 }
 
 // 특정 다이어리를 ID로 가져오는 함수
 export async function getDiaryById(id: string) {
-  const { data, error } = await supabase
-    .from('diary')
-    .select('*')
-    .eq('id', id)
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from('diary')
+      .select('*')
+      .eq('id', id)
+      .single();
 
-  if (error) {
+    if (error) {
+      throw new Error(`다이어리 조회 실패: ${error.message}`);
+    }
+
+    if (!data) {
+      throw new Error(`ID가 ${id}인 다이어리를 찾을 수 없습니다.`);
+    }
+
+    return data as Diary;
+  } catch (error) {
+    console.error(`ID ${id}로 다이어리 조회 중 오류 발생:`, error);
     throw error;
   }
-
-  return data as Diary;
 }
 
 // 다이어리 수정 함수
@@ -106,4 +114,35 @@ export async function deleteDiary(id: string) {
   }
 
   return true;
+}
+
+// 특정 날짜의 다이어리를 가져오는 함수
+export async function getDiaryByDate(date: string) {
+  const { data, error } = await supabase
+    .from('diary')
+    .select('*')
+    .eq('diary_date', date)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    throw error;
+  }
+
+  return data as Diary[];
+}
+
+// 일기가 있는 날짜 목록을 가져오는 함수
+export async function getDiaryDates() {
+  const { data, error } = await supabase
+    .from('diary')
+    .select('diary_date')
+    .order('diary_date', { ascending: true });
+
+  if (error) {
+    throw error;
+  }
+
+  // 중복 날짜 제거
+  const uniqueDates = [...new Set(data.map(item => item.diary_date))];
+  return uniqueDates;
 } 

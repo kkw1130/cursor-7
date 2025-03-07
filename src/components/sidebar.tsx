@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Search, PenSquare } from "lucide-react";
+import { Menu, PenSquare, House } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { CalendarPicker } from "@/components/calendar-picker";
+import { CalendarPicker } from "@/components/CalendarPicker";
 import { SearchBar } from "@/components/SearchBar";
 
 /**
@@ -24,7 +24,7 @@ export function Sidebar({ className }: { className?: string }) {
       <nav className="space-y-2 mb-6">
         <Link href="/">
           <Button variant="ghost" className="w-full justify-start">
-            <Search className="mr-2 h-4 w-4" />
+            <House className="mr-2 h-4 w-4" />
             홈
           </Button>
         </Link>
@@ -42,7 +42,9 @@ export function Sidebar({ className }: { className?: string }) {
       {/* 달력 영역 */}
       <div className="mb-6 overflow-visible">
         <h2 className="text-sm font-semibold mb-2">달력</h2>
-        <CalendarPicker />
+        <div className="border rounded-md p-2">
+          <CalendarPicker />
+        </div>
       </div>
 
       {/* 다크/라이트 모드 토글 */}

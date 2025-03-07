@@ -12,57 +12,15 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { supabase } from '@/lib/supabase';
+import { uploadImageToSupabase } from '@/lib/imageUpload';
 
 interface TiptapEditorProps {
   content: string;
   onChange: (content: string) => void;
-  diaryId?: string;
 }
 
-export function TiptapEditor({ content, onChange, diaryId }: TiptapEditorProps) {
+export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
   const [isUploading, setIsUploading] = useState(false);
-  const tempDiaryId = diaryId || `temp-${Date.now()}`;
-
-  // 이미지 업로드 처리 함수
-  const handleImageUpload = async (file: File): Promise<string | null> => {
-    try {
-      setIsUploading(true);
-      
-      // 파일 이름 생성
-      const fileExt = file.name.split('.').pop() || 'jpg';
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `${tempDiaryId}/${fileName}`;
-      
-      // Supabase Storage에 직접 업로드
-      const { data, error } = await supabase.storage
-        .from('diary-images')
-        .upload(filePath, file);
-      
-      if (error) {
-        console.error('이미지 업로드 오류:', error);
-        toast.error('이미지 업로드 실패', {
-          description: error.message,
-        });
-        return null;
-      }
-      
-      // 이미지 URL 가져오기
-      const { data: urlData } = supabase.storage
-        .from('diary-images')
-        .getPublicUrl(filePath);
-      
-      return urlData.publicUrl;
-    } catch (error) {
-      console.error('이미지 업로드 중 오류:', error);
-      toast.error('이미지 업로드 실패', {
-        description: '이미지를 업로드하는 중 오류가 발생했습니다.',
-      });
-      return null;
-    } finally {
-      setIsUploading(false);
-    }
-  };
 
   const editor = useEditor({
     extensions: [
@@ -78,50 +36,78 @@ export function TiptapEditor({ content, onChange, diaryId }: TiptapEditorProps) 
         class: 'prose prose-neutral dark:prose-invert max-w-none p-4 min-h-[250px] focus:outline-none'
       },
       handleDrop: (view, event, slice, moved) => {
-        if (!moved && event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0]) {
-          const files = Array.from(event.dataTransfer.files);
-          const imageFiles = files.filter(file => file.type.startsWith('image/'));
-          
-          if (imageFiles.length > 0) {
-            event.preventDefault();
-            
-            // 각 이미지 파일 처리
-            imageFiles.forEach(async (file) => {
-              const imageUrl = await handleImageUpload(file);
-              if (imageUrl) {
-                // 에디터에 이미지 삽입
-                editor?.chain().focus().setImage({ src: imageUrl }).run();
-                toast.success('이미지 업로드 완료');
-              }
-            });
-            
-            return true;
+        // 이미 이동된 요소거나 파일이 없으면 처리하지 않음
+        if (moved || !event.dataTransfer?.files.length) return false;
+
+        // 파일 처리를 위해 이벤트 기본 동작 방지
+        event.preventDefault();
+        
+        const file = event.dataTransfer.files[0];
+        
+        // 토스트 알림 표시
+        toast("이미지 업로드 중...");
+        setIsUploading(true);
+        
+        // 비동기 처리를 위한 즉시 실행 함수
+        (async () => {
+          try {
+            const { url } = await uploadImageToSupabase(file);
+            if (editor) {
+              const node = editor.schema.nodes.image.create({ src: url });
+              editor.commands.insertContent(node);
+              
+              toast("업로드 완료", {
+                description: "이미지가 성공적으로 추가되었습니다",
+              });
+            }
+          } catch (error: unknown) {
+            if (error instanceof Error) {
+              toast("업로드 실패", {
+                description: error.message,
+              });
+            }
+          } finally {
+            setIsUploading(false);
           }
-        }
-        return false;
+        })();
+        
+        return true;
       },
-      handlePaste: (view, event) => {
-        if (event.clipboardData && event.clipboardData.files && event.clipboardData.files[0]) {
-          const files = Array.from(event.clipboardData.files);
-          const imageFiles = files.filter(file => file.type.startsWith('image/'));
-          
-          if (imageFiles.length > 0) {
-            event.preventDefault();
-            
-            // 각 이미지 파일 처리
-            imageFiles.forEach(async (file) => {
-              const imageUrl = await handleImageUpload(file);
-              if (imageUrl) {
-                // 에디터에 이미지 삽입
-                editor?.chain().focus().setImage({ src: imageUrl }).run();
-                toast.success('이미지 업로드 완료');
-              }
-            });
-            
-            return true;
+      handlePaste: (view, event, slice) => {
+        const file = event.clipboardData?.files[0];
+        if (!file?.type.startsWith('image/')) return false;
+
+        // 파일 처리를 위해 이벤트 기본 동작 방지
+        event.preventDefault();
+        
+        // 토스트 알림 표시
+        toast("이미지 업로드 중...");
+        setIsUploading(true);
+        
+        // 비동기 처리를 위한 즉시 실행 함수
+        (async () => {
+          try {
+            const { url } = await uploadImageToSupabase(file);
+            if (editor) {
+              const node = editor.schema.nodes.image.create({ src: url });
+              editor.commands.insertContent(node);
+              
+              toast("업로드 완료", {
+                description: "이미지가 성공적으로 추가되었습니다",
+              });
+            }
+          } catch (error: unknown) {
+            if (error instanceof Error) {
+              toast("업로드 실패", {
+                description: error.message,
+              });
+            }
+          } finally {
+            setIsUploading(false);
           }
-        }
-        return false;
+        })();
+        
+        return true;
       }
     },
     // SSR 하이드레이션 불일치 문제 해결을 위한 설정

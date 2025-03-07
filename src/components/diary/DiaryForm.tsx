@@ -16,23 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-
-const EMOTIONS = [
-  { value: 'happy', label: '😊 행복' },
-  { value: 'sad', label: '😢 슬픔' },
-  { value: 'angry', label: '😠 화남' },
-  { value: 'peaceful', label: '😌 평온' },
-  { value: 'excited', label: '🤗 설렘' },
-  { value: 'tired', label: '😫 피곤' },
-];
-
-const WEATHER = [
-  { value: 'sunny', label: '☀️ 맑음' },
-  { value: 'cloudy', label: '☁️ 흐림' },
-  { value: 'rainy', label: '🌧️ 비' },
-  { value: 'snowy', label: '🌨️ 눈' },
-  { value: 'windy', label: '💨 바람' },
-];
+import { EMOTIONS, WEATHER } from '@/lib/utils';
 
 interface DiaryFormProps {
   diary?: Diary;
@@ -123,7 +107,7 @@ export function DiaryForm({ diary, isEditing = false }: DiaryFormProps) {
 
   // 폼 유효성 검사
   const isFormValid = () => {
-    if (!title || !content || !emotion || !weather) {
+    if (!title.trim() || !content.trim() || !emotion.trim() || !weather.trim()) {
       toast.error('모든 필드를 입력해주세요.');
       return false;
     }
@@ -204,7 +188,6 @@ export function DiaryForm({ diary, isEditing = false }: DiaryFormProps) {
           <TiptapEditor 
             content={content} 
             onChange={(value) => dispatch({ type: 'SET_CONTENT', payload: value })} 
-            diaryId={diary?.id}
           />
         </div>
       </div>
