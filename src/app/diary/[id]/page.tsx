@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import { notFound, redirect } from 'next/navigation';
-import { getDiaryById, deleteDiary } from '@/lib/diary';
+import { notFound } from 'next/navigation';
+import { getDiaryById } from '@/lib/diary';
 import { Button } from '@/components/ui/button';
 import { formatDate, getEmotionIcon, getWeatherIcon } from '@/lib/utils';
-import { ArrowLeft, Edit, Trash } from 'lucide-react';
+import { ArrowLeft, Edit } from 'lucide-react';
 import DeleteDiaryButton from '@/components/diary/DeleteDiaryButton';
 
 interface DiaryPageProps {
@@ -13,12 +13,15 @@ interface DiaryPageProps {
 }
 
 export default async function DiaryPage({ params }: DiaryPageProps) {
-  try {
     // Next.js 15에서는 params가 Promise이므로 await 사용
     const { id } = await params;
-    
+  
     // 다이어리 데이터 가져오기
     const diary = await getDiaryById(id);
+
+    if (diary === null) {
+      notFound();
+    }
     
     // 감정과 날씨 이모티콘 가져오기
     const emotionIcon = getEmotionIcon(diary.emotion);
@@ -72,8 +75,4 @@ export default async function DiaryPage({ params }: DiaryPageProps) {
         </div>
       </main>
     );
-  } catch (error) {
-    console.error('다이어리 조회 오류:', error);
-    notFound();
-  }
 } 

@@ -12,7 +12,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 export type Diary = {
   id: string;
   title: string;
-  content: string | any; // Tiptap 에디터 내용 (JSON 또는 텍스트)
+  content: string;
   emotion: string;
   weather: string;
   created_at: string;

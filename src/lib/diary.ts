@@ -1,4 +1,6 @@
 import { supabase } from './supabase';
+import { format } from 'date-fns';
+import { ko } from 'date-fns/locale';
 
 export type Diary = {
   id: string;
@@ -12,12 +14,16 @@ export type Diary = {
 };
 
 export async function createDiary(data: Pick<Diary, 'title' | 'content' | 'emotion' | 'weather'>) {
+  // 현재 시간을 한국 시간으로 변환 (UTC+9)
+  const now = new Date();
+  const koreanDate = format(now, 'yyyy-MM-dd', { locale: ko });
+
   const { data: diary, error } = await supabase
     .from('diary')
     .insert([
       {
         ...data,
-        diary_date: new Date().toISOString().split('T')[0],
+        diary_date: koreanDate,
       },
     ])
     .select()
@@ -58,7 +64,6 @@ export async function getDiaries(searchTerm?: string) {
 
 // 특정 다이어리를 ID로 가져오는 함수
 export async function getDiaryById(id: string) {
-  try {
     // 먼저 데이터가 존재하는지 확인
     const { data: exists, error: existsError } = await supabase
       .from('diary')
@@ -70,7 +75,7 @@ export async function getDiaryById(id: string) {
     }
 
     if (!exists || exists.length === 0) {
-      throw new Error(`ID가 ${id}인 다이어리를 찾을 수 없습니다.`);
+      return null;
     }
 
     // 데이터가 존재하면 전체 데이터 조회
@@ -86,10 +91,7 @@ export async function getDiaryById(id: string) {
     }
 
     return data as Diary;
-  } catch (error) {
-    console.error(`ID ${id}로 다이어리 조회 중 오류 발생:`, error);
-    throw error;
-  }
+  
 }
 
 // 다이어리 수정 함수
@@ -97,11 +99,14 @@ export async function updateDiary(
   id: string, 
   data: Pick<Diary, 'title' | 'content' | 'emotion' | 'weather' | 'diary_date'>
 ) {
+  const now = new Date();
+  const koreanDate = format(now, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx", { locale: ko });
+
   const { data: diary, error } = await supabase
     .from('diary')
     .update({
       ...data,
-      updated_at: new Date().toISOString(),
+      updated_at: koreanDate,
     })
     .eq('id', id)
     .select()
