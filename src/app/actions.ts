@@ -40,7 +40,8 @@ export async function deleteDiaryAction(id: string) {
   try {
     await deleteDiary(id);
     revalidatePath('/');
-    return { success: true };
+    // 리다이렉트 정보를 반환
+    return { success: true, redirect: '/' };
   } catch (error) {
     console.error('일기 삭제 중 오류 발생:', error);
     return { success: false, error: '일기 삭제 중 오류가 발생했습니다.' };

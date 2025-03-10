@@ -35,9 +35,10 @@ export default function DeleteDiaryButton({ id }: DeleteDiaryButtonProps) {
       const result = await deleteDiaryAction(id);
       
       if (result.success) {
+        setIsDialogOpen(false);
         toast.success('일기가 삭제되었습니다.');
-        router.push('/');
-        router.refresh();
+        // 브라우저의 history를 모두 지우고 홈으로 이동
+        window.location.replace('/');
       } else {
         toast.error(result.error || '일기 삭제 중 오류가 발생했습니다.');
       }
@@ -46,7 +47,6 @@ export default function DeleteDiaryButton({ id }: DeleteDiaryButtonProps) {
       toast.error('일기 삭제 중 오류가 발생했습니다.');
     } finally {
       setIsDeleting(false);
-      setIsDialogOpen(false);
     }
   };
 
