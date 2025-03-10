@@ -35,7 +35,7 @@ export default async function HomePage({
       {searchTerm && (
         <div className="mb-6">
           <p className="text-muted-foreground">
-            "{searchTerm}" 검색 결과: {diaries.length}개의 일기
+            {`"${searchTerm}" 검색 결과: ${diaries.length}개의 일기`}
           </p>
         </div>
       )}

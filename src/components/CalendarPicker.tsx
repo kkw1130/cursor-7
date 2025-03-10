@@ -5,7 +5,7 @@ import { ko } from "date-fns/locale";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { getDiaryByDate, getDiaryDates, Diary } from "@/lib/diary";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { DiaryDateSelector } from "@/components/diary/DiaryDateSelector";
 
@@ -22,7 +22,7 @@ export function CalendarPicker() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const router = useRouter();
-
+  const pathname = usePathname();
   // 일기가 있는 날짜 목록 가져오기
   useEffect(() => {
     async function fetchDiaryDates() {
@@ -36,7 +36,7 @@ export function CalendarPicker() {
     }
 
     fetchDiaryDates();
-  }, []);
+  }, [pathname]);
 
   // 날짜 선택 시 해당 날짜의 일기로 이동
   const handleDateSelect = async (selectedDate: Date | undefined) => {
