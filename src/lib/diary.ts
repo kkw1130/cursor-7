@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 
-export interface Diary {
+export type Diary = {
   id: string;
   title: string;
   content: string;
@@ -9,7 +9,7 @@ export interface Diary {
   created_at: string;
   updated_at: string;
   diary_date: string;
-}
+};
 
 export async function createDiary(data: Pick<Diary, 'title' | 'content' | 'emotion' | 'weather'>) {
   const { data: diary, error } = await supabase
@@ -59,18 +59,30 @@ export async function getDiaries(searchTerm?: string) {
 // 특정 다이어리를 ID로 가져오는 함수
 export async function getDiaryById(id: string) {
   try {
+    // 먼저 데이터가 존재하는지 확인
+    const { data: exists, error: existsError } = await supabase
+      .from('diary')
+      .select('id')
+      .eq('id', id);
+
+    if (existsError) {
+      throw new Error(`다이어리 조회 실패: ${existsError.message}`);
+    }
+
+    if (!exists || exists.length === 0) {
+      throw new Error(`ID가 ${id}인 다이어리를 찾을 수 없습니다.`);
+    }
+
+    // 데이터가 존재하면 전체 데이터 조회
     const { data, error } = await supabase
       .from('diary')
       .select('*')
       .eq('id', id)
+      .limit(1)
       .single();
 
     if (error) {
       throw new Error(`다이어리 조회 실패: ${error.message}`);
-    }
-
-    if (!data) {
-      throw new Error(`ID가 ${id}인 다이어리를 찾을 수 없습니다.`);
     }
 
     return data as Diary;
@@ -145,4 +157,13 @@ export async function getDiaryDates() {
   // 중복 날짜 제거
   const uniqueDates = [...new Set(data.map(item => item.diary_date))];
   return uniqueDates;
+}
+
+interface DiaryFormState {
+  title: string;
+  content: string;
+  emotion: string;
+  weather: string;
+  diaryDate: string;
+  isSubmitting: boolean;
 } 
