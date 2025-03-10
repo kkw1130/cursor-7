@@ -27,7 +27,7 @@ export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
       StarterKit,
       Image,
     ],
-    content,
+    content: content || '',
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
@@ -73,7 +73,7 @@ export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
         
         return true;
       },
-      handlePaste: (view, event, slice) => {
+      handlePaste: (view, event) => {
         const file = event.clipboardData?.files[0];
         if (!file?.type.startsWith('image/')) return false;
 
@@ -169,4 +169,4 @@ export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
       </div>
     </div>
   );
-} 
+}

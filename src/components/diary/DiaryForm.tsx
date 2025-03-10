@@ -107,7 +107,7 @@ export function DiaryForm({ diary, isEditing = false }: DiaryFormProps) {
 
   // 폼 유효성 검사
   const isFormValid = () => {
-    if (!title.trim() || !content.trim() || !emotion.trim() || !weather.trim()) {
+    if (!title.trim() || !content || !emotion.trim() || !weather.trim()) {
       toast.error('모든 필드를 입력해주세요.');
       return false;
     }
