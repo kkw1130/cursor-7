@@ -27,8 +27,14 @@ export function CalendarPicker() {
   useEffect(() => {
     async function fetchDiaryDates() {
       try {
-        const dates = await getDiaryDates();
-        setDiaryDates(dates);
+        const result = await getDiaryDates();
+        
+        if (result.error) {
+          toast.error(result.message || "일기 날짜를 불러오는데 실패했습니다.");
+          return;
+        }
+
+        setDiaryDates(result.data ?? []);
       } catch (error) {
         console.error("일기 날짜 가져오기 오류:", error);
         toast.error("일기 날짜를 불러오는데 실패했습니다.");
@@ -47,7 +53,14 @@ export function CalendarPicker() {
     
     try {
       const formattedDate = format(selectedDate, "yyyy-MM-dd");
-      const diaries = await getDiaryByDate(formattedDate);
+      const result = await getDiaryByDate(formattedDate);
+      
+      if (result.error) {
+        toast.error(result.message || "일기를 불러오는데 실패했습니다.");
+        return;
+      }
+
+      const diaries = result.data ?? [];
       
       if (diaries.length > 0) {
         if (diaries.length === 1) {

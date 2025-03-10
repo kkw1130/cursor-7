@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { EMOTIONS, WEATHER } from "./constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -14,25 +15,6 @@ export function formatDate(dateString: string): string {
     day: 'numeric',
   });
 }
-
-// 감정 이모티콘 매핑
-export const EMOTIONS = [
-  { value: 'happy', label: '😊 행복', icon: '😊' },
-  { value: 'sad', label: '😢 슬픔', icon: '😢' },
-  { value: 'angry', label: '😠 화남', icon: '😠' },
-  { value: 'peaceful', label: '😌 평온', icon: '😌' },
-  { value: 'excited', label: '🤗 설렘', icon: '🤗' },
-  { value: 'tired', label: '😫 피곤', icon: '😫' },
-];
-
-// 날씨 이모티콘 매핑
-export const WEATHER = [
-  { value: 'sunny', label: '☀️ 맑음', icon: '☀️' },
-  { value: 'cloudy', label: '☁️ 흐림', icon: '☁️' },
-  { value: 'rainy', label: '🌧️ 비', icon: '🌧️' },
-  { value: 'snowy', label: '🌨️ 눈', icon: '🌨️' },
-  { value: 'windy', label: '💨 바람', icon: '💨' },
-];
 
 // 감정 이모티콘 가져오기
 export function getEmotionIcon(emotionValue: string): string {
@@ -61,9 +43,23 @@ export function extractFirstImageUrl(content: string): string | null {
 // HTML 태그를 제거하고 일부 텍스트만 추출
 export function extractTextPreview(content: string, maxLength: number = 100): string {
   try {
-    // HTML 태그 제거
-    const textContent = content.replace(/<[^>]+>/g, '');
-    // 지정된 길이로 자르기
+    // 1. HTML 태그 제거
+    let textContent = content.replace(/<[^>]+>/g, '');
+    
+    // 2. 일반적인 HTML 엔티티 디코딩
+    textContent = textContent
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&#x2F;/g, '/')
+      .replace(/&#x60;/g, '`')
+      .replace(/&#x3D;/g, '=')
+      // 추가적인 HTML 엔티티도 필요한 경우 여기에 추가
+      
+    // 3. 지정된 길이로 자르기
     return textContent.length > maxLength
       ? textContent.slice(0, maxLength) + '...'
       : textContent;
@@ -71,4 +67,4 @@ export function extractTextPreview(content: string, maxLength: number = 100): st
     console.error('텍스트 미리보기 생성 중 오류 발생:', error);
     return '';
   }
-}
+} 

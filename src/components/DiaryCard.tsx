@@ -57,4 +57,5 @@ export function DiaryCard({ diary }: DiaryCardProps) {
       </Card>
     </Link>
   );
-} 
+}
+

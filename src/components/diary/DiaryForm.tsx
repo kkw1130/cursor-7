@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { EMOTIONS, WEATHER } from '@/lib/utils';
+import { EMOTIONS, WEATHER } from '@/lib/constants';
 
 interface DiaryFormProps {
   diary?: Diary;
@@ -130,7 +130,6 @@ export function DiaryForm({ diary, isEditing = false }: DiaryFormProps) {
         if (result.success) {
           toast.success('일기가 수정되었습니다.');
           router.push(`/diary/${diary.id}`);
-          router.refresh();
         } else {
           toast.error(result.error || '일기 수정 중 오류가 발생했습니다.');
         }
@@ -145,8 +144,7 @@ export function DiaryForm({ diary, isEditing = false }: DiaryFormProps) {
         
         if (result.success) {
           toast.success('새 일기가 작성되었습니다.');
-          router.push('/');
-          router.refresh();
+          router.push(`/diary/${result.id}`);
         } else {
           toast.error(result.error || '일기 작성 중 오류가 발생했습니다.');
         }

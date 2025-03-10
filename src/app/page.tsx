@@ -12,12 +12,16 @@ export default async function HomePage({
 }: {
   searchParams: Promise<{ search?: string }>;
 }) {
-  // 검색어 가져오기 (Next.js 15.1.6에서는 searchParams가 Promise이므로 await 필요)
   const params = await searchParams;
   const searchTerm = params.search || '';
   
-  // 다이어리 목록 가져오기 (검색어가 있으면 필터링)
-  const diaries = await getDiaries(searchTerm);
+  const result = await getDiaries(searchTerm);
+
+  if (result.error) {
+    throw new Error(result.message || '다이어리 목록을 불러오는데 실패했습니다');
+  }
+
+  const diaries = result.data || [];
 
   return (
     <main className="container mx-auto py-6 px-4 md:px-6">
@@ -46,16 +50,15 @@ export default async function HomePage({
             {searchTerm ? '검색 결과가 없습니다' : '작성된 일기가 없습니다'}
           </h2>
           <p className="text-muted-foreground mb-6">
-            {searchTerm ? '다른 검색어로 시도해보세요' : '첫 번째 일기를 작성해보세요!'}
+            {searchTerm 
+              ? '다른 검색어로 다시 시도해보세요' 
+              : '첫 번째 일기를 작성해보세요'}
           </p>
-          {!searchTerm && (
-            <Link href="/new">
-              <Button className="flex items-center gap-2">
-                <PlusCircle className="h-4 w-4" />
-                새 일기 작성
-              </Button>
-            </Link>
-          )}
+          <Link href="/new">
+            <Button>
+              새 일기 작성하기
+            </Button>
+          </Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

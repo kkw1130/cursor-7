@@ -19,7 +19,7 @@ interface TiptapEditorProps {
   onChange: (content: string) => void;
 }
 
-export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
+export function TiptapEditor({ content = '', onChange }: TiptapEditorProps) {
   const [isUploading, setIsUploading] = useState(false);
 
   const editor = useEditor({
@@ -27,7 +27,7 @@ export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
       StarterKit,
       Image,
     ],
-    content: content || '',
+    content,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
