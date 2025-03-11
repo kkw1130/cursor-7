@@ -1,71 +1,70 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { updateDiary, deleteDiary, createDiary } from '@/lib/diary';
-import { Diary } from '@/lib/diary';
+import { updateDiary, deleteDiary, createDiary, ServerDiary } from '@/lib/diary';
+
+const sanitizeContent = (content: Record<string, any>) => {
+  return JSON.parse(JSON.stringify(content));
+};
 
 // 새 일기 작성 서버 액션
-export async function createDiaryAction(
-  data: Pick<Diary, 'title' | 'content' | 'emotion' | 'weather'>
-) {
+export async function createDiaryAction(data: ServerDiary) {
+  const content = typeof data.content === 'string' ? JSON.parse(data.content) : data.content;
+  data.content = sanitizeContent(content);
   const result = await createDiary(data);
-  
+
   if (result.error) {
-    console.error('일기 작성 중 오류 발생:', result.message);
-    return { 
-      success: false, 
-      error: result.message || '일기 작성 중 오류가 발생했습니다.' 
+    return {
+      success: false,
+      error: result.message || '일기 작성 중 오류가 발생했습니다.',
     };
   }
-  
+
   revalidatePath('/');
-  
-  return { 
-    success: true, 
-    id: result.data?.id || '' 
+
+  return {
+    success: true,
+    id: result.data?.id || '',
   };
 }
 
 // 일기 수정 서버 액션
-export async function updateDiaryAction(
-  id: string,
-  data: Pick<Diary, 'title' | 'content' | 'emotion' | 'weather' | 'diary_date'>
-) {
+export async function updateDiaryAction(id: string, data: ServerDiary) {
   const result = await updateDiary(id, data);
-  
+
   if (result.error) {
     console.error('일기 수정 중 오류 발생:', result.message);
-    return { 
-      success: false, 
-      error: result.message || '일기 수정 중 오류가 발생했습니다.' 
+    return {
+      success: false,
+      error: result.message || '일기 수정 중 오류가 발생했습니다.',
     };
   }
-  
+
   revalidatePath('/');
   revalidatePath(`/diary/${id}`);
-  
-  return { 
-    success: true, 
-    id: result.data?.id || id 
+
+  return {
+    success: true,
+    id: result.data?.id || id,
   };
 }
 
 // 일기 삭제 서버 액션
 export async function deleteDiaryAction(id: string) {
   const result = await deleteDiary(id);
-  
+
   if (result.error) {
     console.error('일기 삭제 중 오류 발생:', result.message);
-    return { 
-      success: false, 
-      error: result.message || '일기 삭제 중 오류가 발생했습니다.' 
+    return {
+      success: false,
+      error: result.message || '일기 삭제 중 오류가 발생했습니다.',
     };
   }
-  
+
   revalidatePath('/', 'layout');
-  
-  return { 
+
+  return {
     success: true,
-    deletedId: id 
+    deletedId: id,
   };
-} 
+}

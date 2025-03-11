@@ -5,7 +5,7 @@ import { ko } from 'date-fns/locale';
 export type Diary = {
   id: string;
   title: string;
-  content: string;
+  content: Record<string, any>;
   emotion: string;
   weather: string;
   created_at: string;
@@ -13,9 +13,16 @@ export type Diary = {
   diary_date: string;
 };
 
-export async function createDiary(data: Pick<Diary, 'title' | 'content' | 'emotion' | 'weather'>) {
+export type ServerDiary = Partial<Omit<Diary, 'content'>> & {
+  content: string;
+  title: string;
+  emotion: string;
+  weather: string;
+  diary_date: string;
+};
+
+export async function createDiary(data: ServerDiary) {
   try {
-    // 현재 시간을 한국 시간으로 변환
     const now = new Date();
     const koreanDate = format(now, 'yyyy-MM-dd', { locale: ko });
 
@@ -23,7 +30,10 @@ export async function createDiary(data: Pick<Diary, 'title' | 'content' | 'emoti
       .from('diary')
       .insert([
         {
-          ...data,
+          title: data.title,
+          content: data.content,
+          emotion: data.emotion,
+          weather: data.weather,
           diary_date: koreanDate,
         },
       ])
@@ -35,7 +45,7 @@ export async function createDiary(data: Pick<Diary, 'title' | 'content' | 'emoti
     }
 
     return { data: diary as Diary };
-  } catch (error) {
+  } catch {
     return { error: 'UNKNOWN_ERROR', message: '다이어리 생성 중 오류가 발생했습니다' };
   }
 }
@@ -43,10 +53,7 @@ export async function createDiary(data: Pick<Diary, 'title' | 'content' | 'emoti
 // 모든 다이어리 목록을 가져오는 함수
 export async function getDiaries(searchTerm?: string) {
   try {
-    let query = supabase
-      .from('diary')
-      .select('*')
-      .order('created_at', { ascending: false });
+    let query = supabase.from('diary').select('*').order('created_at', { ascending: false });
 
     if (searchTerm) {
       query = query.ilike('title', `%${searchTerm}%`);
@@ -59,7 +66,7 @@ export async function getDiaries(searchTerm?: string) {
     }
 
     return { data: data as Diary[] };
-  } catch (error) {
+  } catch {
     return { error: 'UNKNOWN_ERROR', message: '다이어리 목록을 불러오는데 실패했습니다' };
   }
 }
@@ -80,27 +87,20 @@ export async function getDiaryById(id: string) {
       return { error: 'NOT_FOUND', message: '다이어리를 찾을 수 없습니다' };
     }
 
-    const { data, error } = await supabase
-      .from('diary')
-      .select('*')
-      .eq('id', id)
-      .single();
+    const { data, error } = await supabase.from('diary').select('*').eq('id', id).single();
 
     if (error) {
       return { error: 'DATABASE_ERROR', message: error.message };
     }
 
     return { data: data as Diary };
-  } catch (error) {
+  } catch {
     return { error: 'UNKNOWN_ERROR', message: '다이어리를 불러오는데 실패했습니다' };
   }
 }
 
 // 다이어리 수정 함수
-export async function updateDiary(
-  id: string, 
-  data: Pick<Diary, 'title' | 'content' | 'emotion' | 'weather' | 'diary_date'>
-) {
+export async function updateDiary(id: string, data: ServerDiary) {
   try {
     const { data: diary, error } = await supabase
       .from('diary')
@@ -114,7 +114,7 @@ export async function updateDiary(
     }
 
     return { data: diary as Diary };
-  } catch (error) {
+  } catch {
     return { error: 'UNKNOWN_ERROR', message: '다이어리 수정 중 오류가 발생했습니다' };
   }
 }
@@ -122,17 +122,14 @@ export async function updateDiary(
 // 다이어리 삭제 함수
 export async function deleteDiary(id: string) {
   try {
-    const { error } = await supabase
-      .from('diary')
-      .delete()
-      .eq('id', id);
+    const { error } = await supabase.from('diary').delete().eq('id', id);
 
     if (error) {
       return { error: 'DATABASE_ERROR', message: error.message };
     }
 
     return { success: true };
-  } catch (error) {
+  } catch {
     return { error: 'UNKNOWN_ERROR', message: '다이어리 삭제 중 오류가 발생했습니다' };
   }
 }
@@ -151,7 +148,7 @@ export async function getDiaryByDate(date: string) {
     }
 
     return { data: data as Diary[] };
-  } catch (error) {
+  } catch {
     return { error: 'UNKNOWN_ERROR', message: '해당 날짜의 다이어리를 불러오는데 실패했습니다' };
   }
 }
@@ -169,9 +166,9 @@ export async function getDiaryDates() {
     }
 
     // 중복 날짜 제거
-    const uniqueDates = [...new Set(data.map(item => item.diary_date))];
+    const uniqueDates = [...new Set(data.map((item) => item.diary_date))];
     return { data: uniqueDates };
-  } catch (error) {
+  } catch {
     return { error: 'UNKNOWN_ERROR', message: '날짜 목록을 불러오는데 실패했습니다' };
   }
 }
@@ -179,7 +176,7 @@ export async function getDiaryDates() {
 // 폼 상태 인터페이스
 export interface DiaryFormState {
   title: string;
-  content: string;
+  content: Record<string, any>;
   emotion: string;
   weather: string;
   diaryDate: string;

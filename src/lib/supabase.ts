@@ -12,39 +12,10 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 export type Diary = {
   id: string;
   title: string;
-  content: string;
+  content: Record<string, any>;
   emotion: string;
   weather: string;
   created_at: string;
   updated_at: string;
   diary_date: string;
 };
-
-// 이미지 업로드 관련 유틸리티 함수
-export const uploadImage = async (file: File, diaryId: string): Promise<string | null> => {
-  try {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}.${fileExt}`;
-    const filePath = `${diaryId}/${fileName}`;
-
-    // 이미지 업로드
-    const { error: uploadError } = await supabase.storage
-      .from('diary-images')
-      .upload(filePath, file);
-
-    if (uploadError) {
-      console.error('이미지 업로드 오류:', uploadError);
-      return null;
-    }
-
-    // 이미지 URL 가져오기
-    const { data } = supabase.storage
-      .from('diary-images')
-      .getPublicUrl(filePath);
-
-    return data.publicUrl;
-  } catch (error) {
-    console.error('이미지 업로드 중 오류 발생:', error);
-    return null;
-  }
-}; 
