@@ -7,6 +7,7 @@ import { Menu, PenSquare, House } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { CalendarPicker } from '@/components/CalendarPicker';
 import { SearchBar } from '@/components/SearchBar';
+import { Suspense } from 'react';
 
 /**
  * 사이드바 컴포넌트
@@ -35,7 +36,9 @@ export function Sidebar({ className }: { className?: string }) {
       </nav>
 
       {/* 검색 영역 */}
-      <SearchBar />
+      <Suspense fallback={<div className='mb-6'>검색창 로딩중...</div>}>
+        <SearchBar />
+      </Suspense>
 
       {/* 달력 영역 */}
       <div className='mb-6 overflow-visible'>
