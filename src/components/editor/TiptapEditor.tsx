@@ -81,25 +81,8 @@ export function TiptapEditor({ content = '', onChange }: TiptapEditorProps) {
           try {
             const { url } = await uploadImageToSupabase(file);
             if (editor) {
-              // 이미지 노드 생성 및 삽입
-              const imageNode = {
-                type: 'image',
-                attrs: {
-                  src: url,
-                },
-              };
-
-              editor.commands.insertContent(imageNode);
-
-              // 에디터의 현재 상태를 직접 가져옴
-              const currentContent = editor.state.doc.toJSON();
-              const normalizedContent = {
-                type: 'doc',
-                content: currentContent.content || [],
-              };
-
-              onChange(normalizedContent);
-
+              const node = editor.schema.nodes.image.create({ src: url });
+              editor.commands.insertContent(node);
               toast('업로드 완료', {
                 description: '이미지가 성공적으로 추가되었습니다',
               });

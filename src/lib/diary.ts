@@ -1,6 +1,7 @@
 import { supabase } from './supabase';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
+import { ServerDiary } from '@/app/actions';
 
 export type Diary = {
   id: string;
@@ -10,14 +11,6 @@ export type Diary = {
   weather: string;
   created_at: string;
   updated_at: string;
-  diary_date: string;
-};
-
-export type ServerDiary = Partial<Omit<Diary, 'content'>> & {
-  content: string;
-  title: string;
-  emotion: string;
-  weather: string;
   diary_date: string;
 };
 

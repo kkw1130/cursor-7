@@ -40,7 +40,6 @@ export interface DiaryFormState {
   content: Record<string, any>;
   emotion: string;
   weather: string;
-  diaryDate: string;
   isSubmitting: boolean;
 }
 
@@ -55,8 +54,6 @@ function diaryFormReducer(state: DiaryFormState, action: DiaryFormAction): Diary
       return { ...state, emotion: action.payload };
     case 'SET_WEATHER':
       return { ...state, weather: action.payload };
-    case 'SET_DIARY_DATE':
-      return { ...state, diaryDate: action.payload };
     case 'SET_SUBMITTING':
       return { ...state, isSubmitting: action.payload };
     case 'RESET_FORM':
@@ -65,7 +62,6 @@ function diaryFormReducer(state: DiaryFormState, action: DiaryFormAction): Diary
         content: {},
         emotion: '',
         weather: '',
-        diaryDate: new Date().toISOString().split('T')[0],
         isSubmitting: false,
       };
     case 'LOAD_DIARY':
@@ -74,7 +70,6 @@ function diaryFormReducer(state: DiaryFormState, action: DiaryFormAction): Diary
         content: action.payload.content,
         emotion: action.payload.emotion,
         weather: action.payload.weather,
-        diaryDate: action.payload.diary_date,
         isSubmitting: false,
       };
     default:
@@ -91,12 +86,11 @@ export function DiaryForm({ diary, isEditing = false }: DiaryFormProps) {
     content: diary?.content || {},
     emotion: diary?.emotion || '',
     weather: diary?.weather || '',
-    diaryDate: diary?.diary_date || new Date().toISOString().split('T')[0],
     isSubmitting: false,
   };
 
   const [state, dispatch] = useReducer(diaryFormReducer, initialState);
-  const { title, content, emotion, weather, diaryDate, isSubmitting } = state;
+  const { title, content, emotion, weather, isSubmitting } = state;
 
   // 수정 모드에서 초기 데이터 설정
   useEffect(() => {
@@ -125,7 +119,6 @@ export function DiaryForm({ diary, isEditing = false }: DiaryFormProps) {
           content: serializedContent,
           emotion,
           weather,
-          diary_date: diaryDate,
         });
 
         if (result.success) {
@@ -140,7 +133,6 @@ export function DiaryForm({ diary, isEditing = false }: DiaryFormProps) {
           content: serializedContent,
           emotion,
           weather,
-          diary_date: diaryDate,
         });
 
         if (result.success) {
