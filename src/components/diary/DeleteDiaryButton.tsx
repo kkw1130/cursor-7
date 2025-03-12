@@ -31,15 +31,11 @@ export default function DeleteDiaryButton({ id }: DeleteDiaryButtonProps) {
     setIsDeleting(true);
     
     try {
-      // 서버 액션을 사용하여 일기 삭제
       const result = await deleteDiaryAction(id);
       
       if (result.success) {
         toast.success('일기가 삭제되었습니다.');
-        router.push('/');
-        router.refresh();
-      } else {
-        toast.error(result.error || '일기 삭제 중 오류가 발생했습니다.');
+        router.replace('/');
       }
     } catch (error) {
       console.error('일기 삭제 중 오류 발생:', error);

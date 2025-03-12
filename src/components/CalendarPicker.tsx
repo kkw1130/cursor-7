@@ -5,7 +5,7 @@ import { ko } from "date-fns/locale";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { getDiaryByDate, getDiaryDates, Diary } from "@/lib/diary";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { DiaryDateSelector } from "@/components/diary/DiaryDateSelector";
 
@@ -22,13 +22,19 @@ export function CalendarPicker() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const router = useRouter();
-
+  const pathname = usePathname();
   // 일기가 있는 날짜 목록 가져오기
   useEffect(() => {
     async function fetchDiaryDates() {
       try {
-        const dates = await getDiaryDates();
-        setDiaryDates(dates);
+        const result = await getDiaryDates();
+        
+        if (result.error) {
+          toast.error(result.message || "일기 날짜를 불러오는데 실패했습니다.");
+          return;
+        }
+
+        setDiaryDates(result.data ?? []);
       } catch (error) {
         console.error("일기 날짜 가져오기 오류:", error);
         toast.error("일기 날짜를 불러오는데 실패했습니다.");
@@ -36,7 +42,7 @@ export function CalendarPicker() {
     }
 
     fetchDiaryDates();
-  }, []);
+  }, [pathname]);
 
   // 날짜 선택 시 해당 날짜의 일기로 이동
   const handleDateSelect = async (selectedDate: Date | undefined) => {
@@ -47,7 +53,14 @@ export function CalendarPicker() {
     
     try {
       const formattedDate = format(selectedDate, "yyyy-MM-dd");
-      const diaries = await getDiaryByDate(formattedDate);
+      const result = await getDiaryByDate(formattedDate);
+      
+      if (result.error) {
+        toast.error(result.message || "일기를 불러오는데 실패했습니다.");
+        return;
+      }
+
+      const diaries = result.data ?? [];
       
       if (diaries.length > 0) {
         if (diaries.length === 1) {

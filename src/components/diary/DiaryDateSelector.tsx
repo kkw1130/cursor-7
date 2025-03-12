@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { useRouter } from "next/navigation";
@@ -12,7 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock } from "lucide-react";
+import { Clock } from "lucide-react";
 
 interface DiaryDateSelectorProps {
   isOpen: boolean;
